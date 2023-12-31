@@ -12,7 +12,7 @@ import (
 func main() {
 	// テストしやすいようにrun関数に切り出した
 	if err := run(context.Background()); err != nil {
-		log.Print("failed to terminate server: %v", err)
+		log.Printf("failed to terminate server: %v", err)
 	}
 }
 
@@ -30,7 +30,7 @@ func run(ctx context.Context) error {
 	eg.Go(func() error {
 		// ErrServerClosedで意図的に終了した場合を除く
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("failed to close: %+v", err)
+			log.Printf("failed to close:rub %+v", err)
 			return err
 		}
 		return nil
@@ -43,5 +43,6 @@ func run(ctx context.Context) error {
 		log.Printf("failed to shutdown: %+v", err)
 	}
 
+	// eg.Go()で起動した、errgroupのすべてのゴルーチンが完了するのを待ち、その結果(error)を返す
 	return eg.Wait()
 }
