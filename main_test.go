@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"testing"
 	"time"
@@ -12,17 +13,24 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	l, err := net.Listen("tcp", "localhost:0") // "0"指定 : 利用可能なポートを動的に選択してくれる
+	if err != nil {
+		t.Fatalf("failed to listen port %v", err)
+	}
+
 	// contextを用意
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
 		// テスト対象のrun関数を実行
-		return run(ctx)
+		return run(ctx, l)
 	})
 
 	// リクエスト
 	in := "message"
-	rsp, err := http.Get("http://localhost:18080/" + in)
+	url := fmt.Sprintf("http://%s/%s", l.Addr().String(), in)
+	t.Logf("try request to %q", url)
+	rsp, err := http.Get(url)
 	if err != nil {
 		t.Errorf("failed to get: %+v", err)
 	}
