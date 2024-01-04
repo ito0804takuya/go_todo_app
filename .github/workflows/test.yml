@@ -1,19 +1,39 @@
+# on:
+#   push:
+#     branches:
+#       - "main"
+#   pull_request:
+#     branches:
+#       - "main"
+# name: test
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/setup-go@v3
+#         with:
+#           go-version: '>=1.18'
+#       - uses: actions/checkout@v3
+#       - run: go test ./... -coverprofile=coverage.out
+#       - name: report coverage
+#         uses: k1LoW/octocov-action@v0
+
+name: Test
+
 on:
   push:
     branches:
-      - "main"
+      - main
   pull_request:
-    branches:
-      - "main"
-name: test
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '>=1.18'
       - uses: actions/checkout@v3
-      - run: go test ./... -coverprofile=coverage.out
-      - name: report coverage
-        uses: k1LoW/octocov-action@v0
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+      - name: Run tests with coverage report output
+        run: go test ./... -coverprofile=coverage.out
+      - uses: k1LoW/octocov-action@v0
