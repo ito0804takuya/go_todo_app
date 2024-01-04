@@ -3,15 +3,17 @@ on:
     branches:
       - "main"
   pull_request:
+    branches:
+      - "main"
 name: test
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/setup-go@v3
-      with:
-        go-version: '>=1.18'
-    - uses: actions/checkout@v3
-    - run: go test ./... -coverprofile=coverage.out
-    - name: report coverage
-      uses: k1LoW/octocov-action@v0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.18'
+      - uses: actions/checkout@v3
+      - run: go test ./... -coverprofile=coverage.out
+      - name: report coverage
+        uses: k1LoW/octocov-action@v0
