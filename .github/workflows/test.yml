@@ -1,19 +1,30 @@
+# Github ActionsでGoコードを自動テスト+カバレッジレポート出力するワークフロー
+
+# ワークフロー名
 name: Test
 
+# トリガーイベント定義
 on:
+  # mainブランチに対するpush
   push:
     branches:
       - main
+  # PRを新規作成時
   pull_request:
 
 jobs:
   test:
+    # ubuntu上で実行される
     runs-on: ubuntu-latest
     steps:
+      # 実行環境（ubuntu）へ、リポジトリ内のコードを取得
       - uses: actions/checkout@v3
+      # go環境を準備
       - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
+      # テスト実行
       - name: Run tests with coverage report output
         run: go test ./... -coverprofile=coverage.out
+      # octocovでカバレッジレポートを処理（coverage.outファイルを使ってレポート作成）
       - uses: k1LoW/octocov-action@v0
