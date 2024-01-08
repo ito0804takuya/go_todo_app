@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # 不要な情報は排除しながら、ビルド（成果物バイナリはapp）
-RUN go build -trimpath -ldflogs "-w -s" -o app
+RUN go build -trimpath -ldflags "-w -s" -o app
 
 # --------------------------------------------
 
