@@ -16,6 +16,21 @@ jobs:
   test:
     # ubuntu上で実行される
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_USER: todo
+          MYSQL_PASSWORD: todo
+          MYSQL_DATABASE: todo
     steps:
       # 実行環境（ubuntu）へ、リポジトリ内のコードを取得
       - uses: actions/checkout@v3
@@ -23,6 +38,10 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
+      # MySQL サービスコンテナ起動
+      - run: |
+          go install github.com/sqldef/sqldef/cmd/mysqldef@latest
+          mysqldef -u todo -p todo -h 127.0.0.1 -P 33306 todo < ./_tools/mysql/schema.sql
       # テスト実行
       - name: Run tests with coverage report output
         run: go test ./... -coverprofile=coverage.out
