@@ -41,7 +41,7 @@ jobs:
       # MySQL サービスコンテナ起動
       - run: |
           go install github.com/sqldef/sqldef/cmd/mysqldef@latest
-          mysqldef -u todo -p todo -h 127.0.0.1 -P 33306 todo < ./_tools/mysql/schema.sql
+          mysqldef -u todo -p todo -h 127.0.0.1 -P 3306 todo < ./_tools/mysql/schema.sql
       # テスト実行
       - name: Run tests with coverage report output
         run: go test ./... -coverprofile=coverage.out
