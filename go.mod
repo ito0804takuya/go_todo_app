@@ -8,6 +8,8 @@ require (
 	golang.org/x/sync v0.5.0
 )
 
+require github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
+
 require (
 	github.com/go-chi/chi/v5 v5.0.11 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
