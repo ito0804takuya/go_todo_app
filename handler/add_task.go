@@ -6,15 +6,10 @@ import (
 	// "time"
 
 	"github.com/go-playground/validator"
-	"github.com/ito0804takuya/go_todo_app/entity"
-	"github.com/ito0804takuya/go_todo_app/store"
-	"github.com/jmoiron/sqlx"
 )
 
 type AddTask struct {
-	// Store *store.TaskStore
-	DB *sqlx.DB
-	Repo *store.Repository
+	Service AddTaskService
 	Validator *validator.Validate
 }
 
@@ -38,13 +33,7 @@ func (at *AddTask) ServerHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := &entity.Task{
-		Title: b.Title,
-		Status: entity.TaskStatusTodo,
-		// Created: time.Now(),
-	}
-	// id, err := store.Tasks.Add(t)
-	err = at.Repo.AddTask(ctx, at.DB, t)
+	t, err := at.Service.AddTask(ctx, b.Title)
 	if err != nil {
 		RespondJSON(ctx, w, &ErrResponse{
 			Message: err.Error(),
