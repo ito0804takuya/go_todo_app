@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
