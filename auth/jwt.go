@@ -24,13 +24,13 @@ var rawPubKey []byte
 
 type JWTer struct {
 	PrivateKey, PublicKey jwk.Key
-	Store Store
-	Clocker clock.Clocker
+	Store                 Store
+	Clocker               clock.Clocker
 }
 
 //go:generate go run github.com/matryer/moq -out moq_test.go . Store
 type Store interface {
-	Save(ctx context.Context, key string,  userID entity.UserID) error
+	Save(ctx context.Context, key string, userID entity.UserID) error
 	Load(ctx context.Context, key string) (entity.UserID, error)
 }
 
@@ -60,7 +60,7 @@ func parse(rawKey []byte) (jwk.Key, error) {
 }
 
 const (
-	RoleKey = "role"
+	RoleKey     = "role"
 	UserNameKey = "user_name"
 )
 
