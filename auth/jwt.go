@@ -4,10 +4,14 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/ito0804takuya/go_todo_app/clock"
 	"github.com/ito0804takuya/go_todo_app/entity"
+	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/jwt"
 )
 
 // NOTE: go:embedによって実行バイナリにpemファイルを埋め込むことができる。そうすることでシングルバイナリで実行可能になる
@@ -53,4 +57,37 @@ func parse(rawKey []byte) (jwk.Key, error) {
 		return nil, err
 	}
 	return key, nil
+}
+
+const (
+	RoleKey = "role"
+	UserNameKey = "user_name"
+)
+
+func (j *JWTer) GenerateToken(ctx context.Context, u entity.User) ([]byte, error) {
+	// (Builderパターン)
+	tok, err := jwt.NewBuilder().
+		JwtID(uuid.New().String()).
+		Issuer(`github.com/ito0804takuya/go_todo_app`).
+		Subject("access_token").
+		IssuedAt(j.Clocker.Now()).
+		Expiration(j.Clocker.Now().Add(30*time.Minute)).
+		Claim(RoleKey, u.Role).
+		Claim(UserNameKey, u.Name).
+		Build()
+
+	if err != nil {
+		return nil, fmt.Errorf("GetToken: failed to build token: %w", err)
+	}
+	// JWT(トークン)をユーザIDに紐づけてKVS(Redis)に保存
+	if err := j.Store.Save(ctx, tok.JwtID(), u.ID); err != nil {
+		return nil, err
+	}
+
+	// 秘密鍵を使ってトークンを署名する（→クライアントは公開鍵を使って検証する）
+	signed, err := jwt.Sign(tok, jwa.RS256, j.PrivateKey)
+	if err != nil {
+		return nil, err
+	}
+	return signed, nil
 }
